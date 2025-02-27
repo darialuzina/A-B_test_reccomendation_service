@@ -48,13 +48,23 @@ model_test = load_models("model_test")
 import pandas as pd
 from sqlalchemy import create_engine
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Load environment variables from .env file
+
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+
+
 
 def batch_load_sql(query: str) -> pd.DataFrame:
     CHUNKSIZE = 200000
-    engine = create_engine(
-        "postgresql://robot-startml-ro:pheiph0hahj1Vaif@"
-        "postgres.lab.karpov.courses:6432/startml"
-    )
     conn = engine.connect().execution_options(stream_results=True)
     chunks = []
     for chunk_dataframe in pd.read_sql(query, conn, chunksize=CHUNKSIZE):
